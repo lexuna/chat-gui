@@ -1,0 +1,31 @@
+.borderPane {
+	-fx-background-color: grey;
+}
+
+.box {
+	-fx-border-color: red;
+}
+
+.textArea {
+	-fx-border-radius: 10 10 10 10;
+	-fx-background-radius: 10 10 10 10;
+}
+
+.userMessage {
+	-fx-border-radius: 10 0 10 10;
+	-fx-background-radius: 10 0 10 10;
+	-fx-border-color: #7D7D7D;
+	
+	-fx-padding: 10;
+	-fx-alignment: center-right ;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+.text-area .scroll-pane .viewport{
+    -fx-background-color: transparent;
+}
+.text-area .scroll-pane .content{
+    -fx-background-color: transparent;
+}
