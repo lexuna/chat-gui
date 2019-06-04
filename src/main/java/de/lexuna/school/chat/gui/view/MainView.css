@@ -6,18 +6,33 @@
 	-fx-border-color: red;
 }
 
+.nameField {
+	-fx-background-color: grey;
+	-fx-font-size: 150.0%;
+	-fx-text-fill: white;
+}
+
 .textArea {
-	-fx-border-radius: 10 10 10 10;
-	-fx-background-radius: 10 10 10 10;
+	-fx-border-radius: 10.0 10.0 10.0 10.0;
+	-fx-background-radius: 10.0 10.0 10.0 10.0;
 }
 
 .userMessage {
-	-fx-border-radius: 10 0 10 10;
-	-fx-background-radius: 10 0 10 10;
-	-fx-border-color: #7D7D7D;
+	-fx-border-radius: 10.0 0.0 10.0 10.0;
+	-fx-background-radius: 10.0 0.0 10.0 10.0;
+	-fx-border-color: #40ff00;
 	
-	-fx-padding: 10;
+	-fx-padding: 10.0;
 	-fx-alignment: center-right ;
+}
+
+.message {
+	-fx-border-radius: 0.0 10.0 10.0 10.0;
+	-fx-background-radius: 0.0 10.0 10.0 10.0;
+	-fx-border-color: #00ffff;
+	
+	-fx-padding: 10.0;
+	-fx-alignment: center-left ;
 }
 
 .text-area .scroll-pane {

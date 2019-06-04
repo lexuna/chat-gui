@@ -27,9 +27,13 @@ public class MainController implements Initializable {
     private TextArea textArea;
     @FXML
     private VBox chatBox;
+    @FXML
+    private TextField userName;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        userName.setText(Main.LOGIN.getUserId());
+        userName.setEditable(false);
     }
 
     @FXML
@@ -50,7 +54,7 @@ public class MainController implements Initializable {
         }
     }
 
-    private void addMessage(String text) {
+    public void addMessage(String text, boolean userMassage) {
         TextField field = new TextField(text);
         this.textArea.setWrapText(true);
 //        field.setPrefHeight(50);
@@ -58,7 +62,7 @@ public class MainController implements Initializable {
 //        field.setPrefWidth(text.length() * 7);
 //        field.setMaxWidth(400);
         VBox.setMargin(field, new Insets(10));
-        field.getStyleClass().add("userMessage");
+        field.getStyleClass().add(userMassage ? "userMessage" : "message");
         field.setEditable(false);
         this.chatBox.getChildren().add(field);
     }
@@ -72,9 +76,9 @@ public class MainController implements Initializable {
         }
         sendMessage(text);
     }
-
+    
     private void sendMessage(String text) {
-        addMessage(text);
+        addMessage(text, true);
         Main.sendMessage(text);
     }
 }
