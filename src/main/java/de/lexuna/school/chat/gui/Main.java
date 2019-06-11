@@ -2,7 +2,23 @@ package de.lexuna.school.chat.gui;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import de.lexuna.school.chat.dto.Contacts;
 import de.lexuna.school.chat.dto.Login;
 import de.lexuna.school.chat.dto.Message;
 import de.lexuna.school.chat.gui.view.MainController;
@@ -17,12 +33,15 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    public static final Login LOGIN = new Login("Hannah", "bla");
+    private static final Map<String, byte[]> CONTACTS = new HashMap<>();
+
+    public static Login LOGIN;
 
     private static MainController controller;
     private static Socket socket;
     private static StreamSerealizer serealizer;
     private static StreamDeserializer deserealizer;
+    private static KeyPair KEY_PAIR;
 
     @Override
     public void start(Stage primaryStage) {
@@ -45,8 +64,12 @@ public class Main extends Application {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         try {
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(1024);
+            KEY_PAIR = kpg.genKeyPair();
+            LOGIN = new Login(args[2], KEY_PAIR.getPublic().getEncoded());
             socket = new Socket(args[0], Integer.parseInt(args[1]));
             serealizer = new StreamSerealizer(socket.getOutputStream());
             deserealizer = new StreamDeserializer(socket.getInputStream());
@@ -72,10 +95,29 @@ public class Main extends Application {
     private static void readMessage(Object obj) {
 
         if (obj instanceof Message) {
+            try {
+                Message message = (Message) obj;
+                Cipher cipher = Cipher.getInstance("RSA");
+                cipher.init(Cipher.DECRYPT_MODE, KEY_PAIR.getPrivate());
+                byte[] byteMessage = cipher.doFinal(message.getMessage());
+
+                Platform.runLater(() -> {
+                    controller.addMessage(new String(byteMessage, StandardCharsets.UTF_8), message.getSenderId(),
+                            false);
+                });
+            } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | NoSuchAlgorithmException
+                    | NoSuchPaddingException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else if (obj instanceof Contacts) {
+            System.out.println("Get Contacts");
+            CONTACTS.putAll(((Contacts) obj).getContacts());
             Platform.runLater(() -> {
-                controller.addMessage(((Message) obj).getMessage(), false);
+                controller.addContacts(CONTACTS.keySet());
             });
         }
+
     }
 
     private static void login() {
@@ -88,10 +130,10 @@ public class Main extends Application {
         }
     }
 
-    public static void sendMessage(String text) {
+    public static void sendMessage(String text, String receverId) {
         // TODO Auto-generated method stub
         try {
-            Message message = createMessage(text);
+            Message message = createMessage(text, receverId);
             serealizer.send(message);
         } catch (IOException e) {
             // TODO: handle exception
@@ -99,8 +141,19 @@ public class Main extends Application {
         }
     }
 
-    private static Message createMessage(String text) {
+    private static Message createMessage(String text, String receverId) {
         // TODO Auto-generated method stub
-        return new Message(text, System.currentTimeMillis(), LOGIN.getUserId(), "Daniel");
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE,
+                    KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(CONTACTS.get(receverId))));
+            byte[] byteMessage = cipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
+            return new Message(byteMessage, System.currentTimeMillis(), LOGIN.getUserId(), receverId);
+        } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | NoSuchAlgorithmException
+                | NoSuchPaddingException | InvalidKeySpecException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 }

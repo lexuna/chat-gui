@@ -1,9 +1,11 @@
 .borderPane {
 	-fx-background-color: grey;
+	-fx-border-color: black;
 }
 
 .box {
-	-fx-border-color: red;
+	-fx-border-color: black;
+	-fx-border-width: 1 1 0 1;
 }
 
 .nameField {
@@ -23,7 +25,7 @@
 	-fx-border-color: #40ff00;
 	
 	-fx-padding: 10.0;
-	-fx-alignment: center-right ;
+	-fx-alignment: center-right;
 }
 
 .message {
@@ -32,7 +34,17 @@
 	-fx-border-color: #00ffff;
 	
 	-fx-padding: 10.0;
-	-fx-alignment: center-left ;
+	-fx-alignment: center-left;
+}
+
+.contact {
+	-fx-padding: 10.0;
+	-fx-font-size: 150.0%;
+	-fx-text-fill: white;
+}
+
+.contactBox {
+	-fx-border-color: black;
 }
 
 .text-area .scroll-pane {
